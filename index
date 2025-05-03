@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chấm công Wifi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Chấm công Wifi</h2>
+    <input id="name" placeholder="Nhập tên..." />
+    <button onclick="log()">Xác nhận</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const apiURL = "https://script.google.com/macros/s/AKfycbzQ_nrMvoZ1JPrysTQ2gzIEY3BGyC18VU6eDdI4acBFkaRSOB7dGwbf7mwRQejKYds/exec";
+
+    async function log() {
+      const name = document.getElementById("name").value.trim();
+      const result = document.getElementById("result");
+
+      if (!name) return alert("Vui lòng nhập tên");
+
+      result.innerText = "Đang chấm công...";
+      result.style.color = "#333";
+
+      try {
+        const resIP = await fetch("https://api.ipify.org?format=json");
+        const ip = (await resIP.json()).ip;
+
+        const res = await fetch(apiURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, ip })
+        });
+
+        const text = await res.text();
+        result.innerText = text;
+        result.style.color = text.includes("✅") ? "green" : "red";
+      } catch (e) {
+        result.innerText = "❌ Lỗi kết nối. Thử lại sau.";
+        result.style.color = "red";
+        console.error("Lỗi:", e);
+      }
+    }
+  </script>
+</body>
+</html>
